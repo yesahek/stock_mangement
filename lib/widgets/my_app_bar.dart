@@ -9,6 +9,7 @@ class MyAppBar extends StatelessWidget {
   final bool backButton;
   final bool goHome;
   final Widget ? secondBar;
+  
   const MyAppBar({
     Key? key,
     this.title = "Negade App",

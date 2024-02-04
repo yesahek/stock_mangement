@@ -25,6 +25,8 @@ class SingleTransaction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var isSell = transaction.type.name == "sell";
+    String sign = '';
+    isSell ? sign = '-' : sign = '+';
     void openInvoice() {
       //Navigator.pushNamed(context, '/ItemInvoice');
       Navigator.push(
@@ -33,7 +35,7 @@ class SingleTransaction extends StatelessWidget {
           builder: (context) => ItemInvoice(
             stockId: stockId,
             code: code,
-            date: transaction.dateTime,
+            date: transaction.dateTimeTransaction,
             invNumber: transaction.invoiceNumber,
             name: name,
             quantity: transaction.quantity,
@@ -58,54 +60,38 @@ class SingleTransaction extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 3,
+                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         //Date of Transaction
-                        Text(DateFormat.yMd().format(transaction.dateTime)),
-                        Text(DateFormat.jms().format(transaction.dateTime)),
+                        Text(DateFormat.yMd()
+                            .format(transaction.dateTimeTransaction)),
+                        Text(DateFormat.jms()
+                            .format(transaction.dateTimeTransaction)),
                         Text(transaction.invoiceNumber.toString()),
                       ],
                     ),
                   ),
                   Expanded(
-                    flex: 2,
-                    child: isSell
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Quantity how much sailed
-                              Text(transaction.quantity.toString()),
-                              Text("X ${transaction.price}"),
-                              Text(
-                                  "${transaction.quantity * transaction.price} Br"),
-                            ],
-                          )
-                        : const Text("-------"),
-                  ),
-                  Expanded(
-                    // Quantity how much bought or received
-                    flex: 2,
-                    child: isSell
-                        ? const Text("------")
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Quantity how much sailed
-                              Text(transaction.quantity.toString()),
-                              Text("X ${transaction.price}"),
-                              Text(
-                                  "${transaction.quantity * transaction.price} Br"),
-                            ],
-                          ),
+                    flex: 1,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Quantity how much sailed
+                        //  isSell ? const Text("+") : const Text('-'),
+                        Text("$sign  ${transaction.quantity.toString()}"),
+                        Text("X ${transaction.price}"),
+                        Text("${transaction.quantity * transaction.price} Br"),
+                      ],
+                    ),
                   ),
                   Expanded(
                     flex: 1,
                     child: Column(
                       children: [
                         Text("$balance Items"),
-                        Text("$balance * $costPrice br"),
+                        Text("${balance * costPrice} br"),
                       ],
                     ),
                   ),

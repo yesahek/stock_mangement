@@ -53,7 +53,7 @@ class _ItemInvoiceState extends State<ItemInvoice> {
   void initState() {
     super.initState();
     newTransaction = widget.transaction;
-    _selectedDate = newTransaction.dateTime;
+    _selectedDate = newTransaction.dateTimeTransaction;
     _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
     selectedTransactionType = newTransaction.type;
   }
@@ -157,7 +157,8 @@ class _ItemInvoiceState extends State<ItemInvoice> {
                                   type: newTransaction.type,
                                   quantity: newTransaction.quantity,
                                   invoiceNumber: int.parse(value!),
-                                  dateTime: newTransaction.dateTime,
+                                  dateTimeTransaction: newTransaction.dateTimeTransaction,
+                                  dateTimeSaved: newTransaction.dateTimeSaved,
                                   price: newTransaction.price,
                                 );
                               }),
@@ -189,7 +190,8 @@ class _ItemInvoiceState extends State<ItemInvoice> {
                                 type: newTransaction.type,
                                 quantity: newTransaction.quantity,
                                 invoiceNumber: newTransaction.invoiceNumber,
-                                dateTime: DateTime.parse(value!),
+                                dateTimeTransaction: DateTime.parse(value!),
+                                dateTimeSaved: newTransaction.dateTimeSaved,
                                 price: newTransaction.price,
                               );
                             },
@@ -230,7 +232,8 @@ class _ItemInvoiceState extends State<ItemInvoice> {
                                   type: newTransaction.type,
                                   quantity: int.parse(value!),
                                   invoiceNumber: newTransaction.invoiceNumber,
-                                  dateTime: newTransaction.dateTime,
+                                  dateTimeTransaction: newTransaction.dateTimeTransaction,
+                                  dateTimeSaved: newTransaction.dateTimeSaved,
                                   price: newTransaction.price,
                                 );
                               }),
@@ -267,7 +270,8 @@ class _ItemInvoiceState extends State<ItemInvoice> {
                                   type: newTransaction.type,
                                   quantity: newTransaction.quantity,
                                   invoiceNumber: newTransaction.invoiceNumber,
-                                  dateTime: newTransaction.dateTime,
+                                  dateTimeTransaction: newTransaction.dateTimeTransaction,
+                                  dateTimeSaved: newTransaction.dateTimeSaved,
                                   price: double.parse(value!),
                                 );
                               }),
@@ -291,7 +295,8 @@ class _ItemInvoiceState extends State<ItemInvoice> {
                                       quantity: newTransaction.quantity,
                                       invoiceNumber:
                                           newTransaction.invoiceNumber,
-                                      dateTime: newTransaction.dateTime,
+                                      dateTimeTransaction: newTransaction.dateTimeTransaction,
+                                      dateTimeSaved: newTransaction.dateTimeSaved,
                                       price: newTransaction.price,
                                     );
                                   }

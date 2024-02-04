@@ -13,16 +13,22 @@ class Items with ChangeNotifier {
   double loan;
   double payment;
   bool isPaid;
+  double serviceCharge;
+  double discount;
+  double oldLoan;
   Items({
+    // ignore: non_constant_identifier_names
     required this.id,
     required this.customerName,
-    required this.dateTime,
-    // ignore: non_constant_identifier_names
     required this.Item,
+    required this.dateTime,
     required this.total,
     this.loan = 0.0,
     this.payment = 0.0,
     this.isPaid = true,
+     this.serviceCharge = 0.0,
+     this.discount= 0.0,
+     this.oldLoan =0.0,
   });
 
 // //isPaid?

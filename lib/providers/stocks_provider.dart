@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../models/item.dart';
 import '../models/transaction.dart';
 import '../models/stock.dart';
+import '../models/items.dart';
 
 class StocksProvider with ChangeNotifier {
   final List<Stock> _items = [
@@ -8,7 +10,6 @@ class StocksProvider with ChangeNotifier {
       id: 's1',
       code: 001,
       name: "Micro",
-      datePurchased: DateTime.now(),
       dateRegistored: DateTime.now(),
       costPrice: 750.00,
       sellingPrice: 850.00,
@@ -19,8 +20,9 @@ class StocksProvider with ChangeNotifier {
           type: TransactionType.buy,
           quantity: 15,
           invoiceNumber: 00002,
-          price: 500,
-          dateTime: DateTime.now(),
+          price: 750,
+          dateTimeTransaction: DateTime.now(),
+          dateTimeSaved: DateTime.now(),
         ),
       ],
     ),
@@ -28,35 +30,46 @@ class StocksProvider with ChangeNotifier {
       id: 's2',
       code: 002,
       name: "Link",
-      datePurchased: DateTime.now(),
       dateRegistored: DateTime.now(),
-      costPrice: 750.00,
+      costPrice: 1000.00,
       sellingPrice: 850.00,
       packageType: "CTN",
       transactions: [
         Transaction(
           id: "T001",
-          type: TransactionType.sell,
-          quantity: 10,
+          type: TransactionType.buy,
+          quantity: 100,
           invoiceNumber: 00001,
-          price: 300,
-          dateTime: DateTime.now(),
+          price: 1000,
+          dateTimeTransaction: DateTime.now(),
+          dateTimeSaved: DateTime.now(),
         ),
         Transaction(
           id: "T002",
           type: TransactionType.sell,
-          quantity: 15,
+          quantity: 80,
           invoiceNumber: 00002,
-          price: 150,
-          dateTime: DateTime.now(),
+          price: 1000,
+          dateTimeTransaction: DateTime.now(),
+          dateTimeSaved: DateTime.now(),
         ),
         Transaction(
           id: "T003",
-          type: TransactionType.buy,
-          quantity: 35,
+          type: TransactionType.sell,
+          quantity: 10,
           invoiceNumber: 01548,
-          price: 450,
-          dateTime: DateTime.now(),
+          price: 1000,
+          dateTimeTransaction: DateTime.now(),
+          dateTimeSaved: DateTime.now(),
+        ),
+        Transaction(
+          id: "T004",
+          type: TransactionType.buy,
+          quantity: 10,
+          invoiceNumber: 01548,
+          price: 1000,
+          dateTimeTransaction: DateTime.now(),
+          dateTimeSaved: DateTime.now(),
         ),
       ],
     ),
@@ -72,6 +85,14 @@ class StocksProvider with ChangeNotifier {
     notifyListeners();
   }
 
+//Add new Transaction
+
+  void addTransaction(Transaction newTransaction, String stockId) {
+    Stock findStock = _items.firstWhere((st) => st.id == stockId);
+    findStock.transactions.add(newTransaction);
+    notifyListeners();
+  }
+
 //Finding single stock
   Stock singleStock(String stockid) {
     Stock foundStock;
@@ -79,6 +100,7 @@ class StocksProvider with ChangeNotifier {
     Future.delayed(Duration.zero, () {
       notifyListeners();
     });
+    foundStock.transactions.reversed;
     return foundStock;
   }
 
@@ -90,5 +112,40 @@ class StocksProvider with ChangeNotifier {
         .indexWhere((tr) => tr.id == editTransaction.id);
     _items[stockIndex].transactions[trnaIndex] = editTransaction;
     notifyListeners();
+  }
+
+  Stock findStock(String stockId) {
+    final stock = _items.firstWhere((st) => st.id == stockId);
+    return stock;
+  }
+
+  //finding the closest stock
+  List<List<Stock>> getStocksByCostPrice(List<Item> sells) {
+    List<List<Stock>> foundStock = [];
+
+    for (Item item in sells) {
+      List<Stock> filteredStocks = [];
+
+      for (Stock stock in _items) {
+        if (stock.costPrice <= item.price) {
+          filteredStocks.add(stock);
+        }
+      }
+
+      foundStock.add(filteredStocks);
+    }
+
+    return foundStock;
+  }
+
+  List<Stock> findStocksByCostPrice(double price) {
+    List<Stock> filteredStocks = [];
+    for (Stock stock in _items) {
+      if (stock.costPrice <= price) {
+        filteredStocks.add(stock);
+      }
+    }
+
+    return filteredStocks;
   }
 }

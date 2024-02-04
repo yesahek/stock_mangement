@@ -40,24 +40,10 @@ class _StocksState extends State<Stocks> {
               scrollDirection: Axis.vertical,
               shrinkWrap: true,
               itemCount: stock.length,
-              itemBuilder: (_, i) => SingleStock(received: stock[i].totalReceived,
-                stockId: stock[i].id,
-                balance: stock[i].balance,
-                birrBal: stock[i].balance * stock[i].costPrice,
-                code: stock[i].code,
-                costP: stock[i].costPrice,
-                name: stock[i].name,
+              itemBuilder: (_, i) => SingleStock(
+                stock: stock[i],
+              
                 showDetail: false,
-                //onTap: showDetail,
-                sailed: stock[i].totalSailed,
-                sellingP: stock[i].sellingPrice,
-                dateReg: stock[i].dateRegistored,
-                datePur: stock[i].datePurchased,
-                lastSailed: DateTime.now(),
-                // lastSailed: stock[i]
-                //     .transactions[stock[i].transactions.length - 1]
-                //     .dateTime,
-                transaction: stock[i].transactions,
               ),
             ),
           ],

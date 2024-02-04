@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:provider/provider.dart';
 import 'package:stock_mangement/models/items.dart';
 import 'package:stock_mangement/models/item.dart';
+import 'package:stock_mangement/screens/empity_screen.dart';
 import 'package:stock_mangement/screens/factor_screen.dart';
+import 'package:stock_mangement/screens/invoice_generator_screen.dart';
+
+import '../models/stock.dart';
+import '../providers/stocks_provider.dart';
+import '../util/util.dart';
+
+enum TaxType { percent2, percent15 }
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
@@ -73,6 +83,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       required Color buttonColor,
       bool isMember = true}) {
     var hei = MediaQuery.of(context).size.height;
+    double tax = 2;
+    Items items = parseEquation(equation);
     return Container(
       margin: const EdgeInsets.all(02),
       height: (hei * 0.10) * buttonHeight,
@@ -84,7 +96,21 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
-        onPressed: () => isMember ? myCal(buttonText) : generateFactorButton(),
+        onPressed: () {
+          if (isMember) {
+            myCal(buttonText);
+          } else if (buttonText == 'G') {
+            items.Item[0].price == 0
+                ? generateFactorButton(items, tax, true)
+                : generateFactorButton(items, tax, false);
+          } else if (buttonText == 'I') {
+            //showInvoice(contextaa, items.Item);
+            Items bTax = beforeTax(items, tax);
+            items.Item[0].price == 0
+                ? openInvoiceGenerator(items, bTax, tax, true)
+                : openInvoiceGenerator(items, bTax, tax, false);
+          }
+        },
         child: Text(
           buttonText,
           style: const TextStyle(
@@ -97,6 +123,27 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
+  Items beforeTax(Items items, double tax) {
+    Items bTax = items;
+    double percent = 0.0;
+    if (tax == 2) {
+      percent = 1.02;
+    } else if (tax == 15) {
+      percent == 1.15;
+    }
+    bTax.total = 0.0;
+    for (var i = 0; i < items.Item.length; i++) {
+      double origingalPrice = items.Item[i].price;
+      double bTaxPrice = origingalPrice / percent;
+      String price = bTaxPrice.toStringAsFixed(2);
+      bTax.Item[i].price = double.parse(price);
+      bTax.Item[i].total = items.Item[i].quantity * bTax.Item[i].price;
+      bTax.total += bTax.Item[i].total;
+    }
+
+    return bTax;
+  }
+
   Items parseEquation(String equation) {
     // Replace multiplication signs with '*'
     equation = equation.replaceAll('×', '*');
@@ -106,7 +153,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     // Initialize the list to store Item objects
     Items items = Items(
       id: "id",
-      customerName: "customerName",
+      customerName: "Unkown Customer",
       dateTime: DateTime.now(),
       Item: [],
       total: double.parse(result),
@@ -143,16 +190,43 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     return items;
   }
 
-  generateFactorButton() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => equation == ""
-            ? const SizedBox()
-            : FactorScreen(
-                itemList: parseEquation(equation),
-              ),
-      ),
-    );
+  generateFactorButton(Items items, double tax, bool isEmpity) {
+    isEmpity
+        ? ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('It\'s 000.00.'),
+          ))
+        : Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => equation == ""
+                  ? const SizedBox()
+                  : FactorScreen(
+                      itemList: items,
+                      bTax: beforeTax(items, tax),
+                      tax: tax,
+                    ),
+            ),
+          );
+  }
+
+  void openInvoiceGenerator(Items items, bTax, tax, bool itsEmpity) {
+    itsEmpity
+        ? ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('It\'s 000.00.'),
+          ))
+        : showModalBottomSheet(
+            isScrollControlled: true,
+            showDragHandle: true,
+            context: context,
+            builder: (ctx) {
+              {
+                return InvoiceGeneratorScreen(
+                  items: items,
+                  bTax: bTax,
+                  tax: tax,
+                );
+              }
+            },
+          );
   }
 
   @override
@@ -213,9 +287,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                                     buttonHeight: 1,
                                     buttonColor: yellow),
                                 myCustomButton(
-                                    buttonText: "÷",
+                                    buttonText: "I",
                                     buttonHeight: 1,
-                                    buttonColor: yellow),
+                                    buttonColor: yellow,
+                                    isMember: false),
                                 myCustomButton(
                                     buttonText: "G",
                                     buttonHeight: 1,

@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
 
-enum TransactionType{ buy, sell}
+enum TransactionType { buy, sell }
 
 class Transaction with ChangeNotifier {
   String id;
@@ -9,15 +8,19 @@ class Transaction with ChangeNotifier {
   int quantity;
   int invoiceNumber;
   double price;
-  DateTime dateTime; 
+  DateTime dateTimeTransaction;
+  DateTime dateTimeSaved;
   double total;
+  String remark;
 
   Transaction({
     required this.id,
     required this.type,
     required this.quantity,
     required this.invoiceNumber,
-    required this.dateTime,
-    required this.price, 
-  }) : total = quantity * price ;
+    required this.dateTimeTransaction,
+    required this.dateTimeSaved,
+    required this.price,
+    this.remark = '',
+  }) : total = quantity * price;
 }

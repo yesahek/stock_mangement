@@ -7,17 +7,16 @@ class Stock with ChangeNotifier {
   final String id;
   final int code;
   final String name;
-  final DateTime datePurchased;
   final DateTime dateRegistored;
   final double costPrice;
   late final double sellingPrice;
   final String packageType;
   final List<Transaction> transactions;
+
   Stock({
     required this.id,
     required this.code,
     required this.name,
-    required this.datePurchased,
     required this.dateRegistored,
     required this.costPrice,
     required this.sellingPrice,
@@ -36,6 +35,15 @@ class Stock with ChangeNotifier {
 
   //Balance
   int get balance => calculateBalance(transactions);
+
+  //profit
+  double get profit => calculateProfit(transactions, costPrice);
+
+  //total sailed price
+  double get totalSailedPrice => calculateTotalSailedPrice(transactions);
+
+//total cost price
+  double get totalCostPrice => calculateTotalCostPrice(transactions);
 
   // Attach a listener to the transactions list
   void _listenToTransactions() {
@@ -78,6 +86,42 @@ class Stock with ChangeNotifier {
     }
 
     return totalReceived;
+  }
+
+  //total sailed price
+
+  static double calculateTotalSailedPrice(List<Transaction> transactions) {
+    double totalSailedPrice = 0.0;
+    for (var transaction in transactions) {
+      if (transaction.type == TransactionType.sell) {
+        totalSailedPrice += transaction.total;
+      }
+    }
+    return totalSailedPrice;
+  }
+
+  //total cost price
+
+  static double calculateTotalCostPrice(List<Transaction> transactions) {
+    double totalCostPrice = 0.0;
+    for (var transaction in transactions) {
+      if (transaction.type == TransactionType.buy) {
+        totalCostPrice += transaction.total;
+      }
+    }
+    return totalCostPrice;
+  }
+
+  //profit
+  double calculateProfit(List<Transaction> transactions, double costPrice) {
+    double totalProfit = 0.0;
+    double balancePrice = calculateBalance(transactions) * costPrice;
+    double totalSailedPrice = calculateTotalSailedPrice(transactions);
+    double totalCostPrice =
+        calculateTotalCostPrice(transactions) - balancePrice;
+    // Balance * cost price and substaract from totoal profit
+    totalProfit = totalSailedPrice - totalCostPrice;
+    return totalProfit;
   }
 
   //Balance

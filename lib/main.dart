@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
         routes: {
           Stocks.routeName: (context) => const Stocks(),
           AddNewStocksScreen.routeName: (context) => const AddNewStocksScreen(),
+          // AddNewStockTransactionScreen.routeName: (context) =>  AddNewStockTransactionScreen(),
           Factors.routeName: (context) => const Factors(),
           //StockTransaction.routeName: (context) => const StockTransaction(),
           //ItemInvoice.routeName: (context) => const ItemInvoice(),

@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:stock_mangement/util/colors.dart';
 
 class AppButton extends StatelessWidget {
   final String title;
@@ -13,12 +14,15 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onTap,
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.white,
+    return SizedBox(
+      child: OutlinedButton(
+        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(appColor)),
+        onPressed: onTap,
+        child: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+          ),
         ),
       ),
     );

@@ -2,22 +2,26 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
 import 'package:stock_mangement/providers/factor_provider.dart';
 import 'package:stock_mangement/util/colors.dart';
-
 import 'package:stock_mangement/widgets/app_button.dart';
 
+import '../models/item.dart';
 import '../models/items.dart';
 import '../util/util.dart';
-import '../widgets/my_app_bar.dart';
 import '../widgets/my_text_box.dart';
 
 // ignore: must_be_immutable
 class FactorScreen extends StatefulWidget {
   Items itemList;
+  Items bTax;
+  final double tax;
   FactorScreen({
     Key? key,
     required this.itemList,
+    required this.bTax,
+    required this.tax,
   }) : super(key: key);
 
   @override
@@ -25,17 +29,20 @@ class FactorScreen extends StatefulWidget {
 }
 
 class _FactorScreenState extends State<FactorScreen> {
+  late TextEditingController _invoiceNumberController;
+  late TextEditingController _customerNameController;
   bool _isLoading = false;
   void clear() {}
   void share() {}
-  void save() {
+  void save(String name) {
+    widget.itemList.customerName = name;
     String forSnack = "";
     setState(() {
       _isLoading = true;
     });
     Provider.of<FactorProvider>(context, listen: false)
         .addFactors(widget.itemList);
-    forSnack = "Stock Added successfuly";
+    forSnack = "Factor Added successfuly";
 
     setState(() {
       _isLoading = false;
@@ -44,16 +51,49 @@ class _FactorScreenState extends State<FactorScreen> {
     Navigator.of(context).pop();
   }
 
-  void add() {}
+  void saveToStock() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Invoice Number"),
+          content: TextField(
+            autofocus: true,
+            decoration: const InputDecoration(hintText: "Invoice Number"),
+            controller: _invoiceNumberController,
+          ),
+          actions: const [
+            TextButton(
+              onPressed: null,
+              child: Text("Submit"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-  void generateInvoice() {
-    // Update the loan amount based on the payment
+  @override
+  void initState() {
+    super.initState();
+    _invoiceNumberController = TextEditingController();
+    _customerNameController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _invoiceNumberController.dispose();
+    _customerNameController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
+    final _formKey = GlobalKey<FormState>();
+    List<Item> rows = widget.itemList.Item;
+
     Widget secondBar = Column(
       children: [
         const Divider(
@@ -72,7 +112,28 @@ class _FactorScreenState extends State<FactorScreen> {
             ),
             AppButton(
               title: "Save",
-              onTap: save,
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Customer Name"),
+                      content: TextField(
+                        autofocus: true,
+                        decoration:
+                            const InputDecoration(hintText: "Unkown Customer"),
+                        controller: _customerNameController,
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => save(_customerNameController.text),
+                          child: const Text("Submit"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
@@ -80,150 +141,153 @@ class _FactorScreenState extends State<FactorScreen> {
     );
     return Scaffold(
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            MyAppBar(
-              backButton: true,
-              secondBar: secondBar,
-            ),
-            const Divider(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.values[5],
-              children: [
-                Text(
-                  widget.itemList.customerName,
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              AppBar(
+                backgroundColor: appColor,
+                foregroundColor: Colors.white,
+                title: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Factor"),
+                    SizedBox(
+                      height: 05,
+                    ),
+                  ],
                 ),
-                Text(
-                  "Date ${DateFormat.yMd().format(DateTime.now()).toString()}",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                leading: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
                   ),
+                  onPressed: () {
+                    Navigator.pop(context, widget.itemList);
+                  },
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(15),
-                    width: MediaQuery.of(context).size.width * 0.80,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: DataTable(
-                            dataRowHeight: 35,
-                            columnSpacing: width / 12,
-                            columns: const [
-                              DataColumn(
-                                label: Text('No'),
-                                numeric: true,
-                              ),
-                              DataColumn(label: Text('Name')),
-                              DataColumn(label: Text('Qty')),
-                              DataColumn(label: Text('Price')),
-                              DataColumn(label: Text('Total')),
-                            ],
-                            rows: [
-                              for (var item in widget.itemList.Item)
-                                DataRow(
-                                  cells: [
-                                    DataCell(Text(item.id)),
-                                    DataCell(
-                                      Text(item.name),
-                                      showEditIcon: true,
-                                      placeholder: true,
-                                    ),
-                                    DataCell(Text("${item.quantity}")),
-                                    DataCell(Text("${item.price}")),
-                                    DataCell(Text("${item.total}")),
-                                  ],
-                                ),
-                            ],
-                          ),
-                        ),
-                        //Total, Payment and Loan
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            PopupMenuButton(
-                              icon: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: appColor, width: 3),
-                                ),
-                                //color: Colors.grey,
-                                child: const Row(
-                                  children: [
-                                    Icon(Icons.add),
-                                    Text("Add"),
-                                  ],
-                                ),
-                              ),
-                              itemBuilder: (context) => [
-                                const PopupMenuItem(
-                                  value: Text("B"),
-                                  child: Text("A"),
-                                ),
-                                const PopupMenuItem(
-                                  value: Text("B"),
-                                  child: Text("A"),
-                                ),
-                                const PopupMenuItem(
-                                  value: Text("B"),
-                                  child: Text("A"),
-                                ),
-                              ],
-                              onSelected: (value) {
-                                setState(() {});
-                              },
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Divider(),
-                                MyTextBox(
-                                  amount: widget.itemList.total,
-                                  labelText: "Total      ",
-                                  isEditable: false,
-                                ),
-                                MyTextBox(
-                                  amount: widget.itemList.payment,
-                                  labelText: "payment",
-                                  onChanged: (value) {
-                                    setState(() {
-                                      widget.itemList.payment =
-                                          double.parse(value);
-                                      widget.itemList.loan =
-                                          widget.itemList.total -
-                                              double.parse(value);
-                                    });
-                                  },
-                                ),
-                                Text(
-                                    "Loan                          ${widget.itemList.loan}"),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+              ),
+              Container(
+                color: appColor,
+                child: secondBar,
+              ),
+              const Divider(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.values[5],
+                children: [
+                  Text(
+                    widget.itemList.customerName,
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    "Date ${DateFormat.yMd().format(DateTime.now()).toString()}",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                const RotatedBox(
-                  quarterTurns: 1,
-                  child: Text(
-                    "0912345678",
-                    style: TextStyle(fontSize: 20),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      width: MediaQuery.of(context).size.width * 0.80,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              /// dataRowHeight: 35,
+                              columnSpacing: width / 12,
+                              columns: const [
+                                DataColumn(
+                                  label: Text('No'),
+                                  numeric: true,
+                                ),
+                                DataColumn(label: Text('Name')),
+                                DataColumn(label: Text('Qty')),
+                                DataColumn(label: Text('Price')),
+                                DataColumn(label: Text('Total')),
+                              ],
+                              rows: [
+                                for (var item in rows)
+                                  DataRow(
+                                    cells: [
+                                      DataCell(Text(item.id)),
+                                      DataCell(
+                                        TextFormField(
+                                          initialValue: item.name,
+                                          keyboardType: TextInputType.text,
+                                          onFieldSubmitted: (value) {
+                                            item.name = value;
+                                          },
+                                        ),
+                                        // Text(item.name),
+                                        showEditIcon: true,
+                                        placeholder: true,
+                                      ),
+                                      DataCell(Text("${item.quantity}")),
+                                      DataCell(Text("${item.price}")),
+                                      DataCell(Text("${item.total}")),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                          ),
+                          //Total, Payment and Loan
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Divider(),
+                              MyTextBox(
+                                amount: widget.itemList.total,
+                                labelText: "Total      ",
+                                isEditable: false,
+                              ),
+                              MyTextBox(
+                                amount: widget.itemList.payment,
+                                labelText: "payment",
+                                onChanged: (value) {
+                                  setState(() {
+                                    widget.itemList.payment =
+                                        double.parse(value);
+                                    widget.itemList.loan =
+                                        widget.itemList.total -
+                                            double.parse(value);
+                                  });
+                                },
+                              ),
+                              Text(
+                                  "Loan                          ${widget.itemList.loan}"),
+                            ],
+                          ),
+                          const Divider(),
+                          OutlinedButton(
+                              onPressed: () {
+                                showInvoice(
+                                    context, widget.bTax, rows, widget.tax);
+                              },
+                              child: const Text("Generate Invoice")),
+                        ],
+                      ),
+                    ),
                   ),
-                )
-              ],
-            ),
-          ],
+                  const RotatedBox(
+                    quarterTurns: 1,
+                    child: Text(
+                      "0912345678",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -14,4 +14,6 @@ class Item with ChangeNotifier {
     required this.price,
     required this.total,
   });
+
+ 
 }

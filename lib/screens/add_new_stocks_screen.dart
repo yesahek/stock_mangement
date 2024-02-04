@@ -22,7 +22,6 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
     id: "00",
     code: 00,
     name: "",
-    datePurchased: DateTime.now(),
     dateRegistored: DateTime.now(),
     costPrice: 00.01,
     sellingPrice: 0.01,
@@ -52,7 +51,6 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
 
   bool _isLoading = false;
 
- 
   void _save() {
     //print("Save Button\n $code $costP, $dateP,$name, $pkgType,$sellingP,");
     String forSnack = "";
@@ -144,80 +142,77 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
                               id: _newStock.id,
                               code: int.parse(value!),
                               name: _newStock.name,
-                              datePurchased: _newStock.datePurchased,
                               dateRegistored: _newStock.dateRegistored,
                               costPrice: _newStock.costPrice,
                               sellingPrice: _newStock.sellingPrice,
                               packageType: _newStock.packageType,
                               transactions: _newStock.transactions,
-                             
                             );
                           }),
 
                       //Name input field
                       TextFormField(
-                          initialValue: _initValues['name'],
-                          decoration:
-                              const InputDecoration(labelText: 'Stock Name'),
-                          textInputAction: TextInputAction.next,
-                          //keyboardType: TextInputType.number,
-                          focusNode: _nameFocusNode,
-                          onFieldSubmitted: (_) {
-                            FocusScope.of(context)
-                                .requestFocus(_datePFocusNode);
-                          },
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter a Name.';
-                            }
+                        initialValue: _initValues['name'],
+                        decoration:
+                            const InputDecoration(labelText: 'Stock Name'),
+                        textInputAction: TextInputAction.next,
+                        //keyboardType: TextInputType.number,
+                        focusNode: _nameFocusNode,
+                        onFieldSubmitted: (_) {
+                          FocusScope.of(context).requestFocus(_datePFocusNode);
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Please enter a Name.';
+                          }
 
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _newStock = Stock(
-                              id: _newStock.id,
-                              code: _newStock.code,
-                              name: value!,
-                              datePurchased: _newStock.datePurchased,
-                              dateRegistored: _newStock.dateRegistored,
-                              costPrice: _newStock.costPrice,
-                              sellingPrice: _newStock.sellingPrice,
-                              packageType: _newStock.packageType,
-                              transactions: _newStock.transactions,
-                            );
-                          }),
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _newStock = Stock(
+                            id: _newStock.id,
+                            code: _newStock.code,
+                            name: value!,
+                            dateRegistored: _newStock.dateRegistored,
+                            costPrice: _newStock.costPrice,
+                            sellingPrice: _newStock.sellingPrice,
+                            packageType: _newStock.packageType,
+                            transactions: _newStock.transactions,
+                          );
+                        },
+                      ),
 //Date Input field
-                      TextFormField(
-                          //initialValue: _initValues['datePurchased'],
-                          decoration: const InputDecoration(
-                              labelText: 'Date Purchased'),
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.datetime,
-                          //focusNode: _datePFocusNode,
-                          controller: _dateController,
-                          onTap: () => _selectDate(context),
-                          validator: (value) {
-                            if (_selectedDate == null) {
-                              return 'Please select a date.';
-                            }
-                            return null;
-                          },
-                          onFieldSubmitted: (_) {
-                            FocusScope.of(context).requestFocus(_codeFocusNode);
-                          },
-                          onSaved: (value) {
-                            _newStock = Stock(
-                              id: _newStock.id,
-                              code: _newStock.code,
-                              name: _newStock.name,
-                              datePurchased: DateTime.parse(value!),
-                              dateRegistored: _newStock.dateRegistored,
-                              costPrice: _newStock.costPrice,
-                              sellingPrice: _newStock.sellingPrice,
-                              packageType: _newStock.packageType,
-                              transactions: _newStock.transactions,
-                            );
-                          }),
+                      // TextFormField(
+                      //     //initialValue: _initValues['datePurchased'],
+                      //     decoration: const InputDecoration(
+                      //         labelText: 'Date Purchased'),
+                      //     textInputAction: TextInputAction.next,
+                      //     keyboardType: TextInputType.datetime,
+                      //     //focusNode: _datePFocusNode,
+                      //     controller: _dateController,
+                      //     onTap: () => _selectDate(context),
+                      //     validator: (value) {
+                      //       if (_selectedDate == null) {
+                      //         return 'Please select a date.';
+                      //       }
+                      //       return null;
+                      //     },
+                      //     onFieldSubmitted: (_) {
+                      //       FocusScope.of(context).requestFocus(_codeFocusNode);
+                      //     },
+                      //     onSaved: (value) {
+                      //       _newStock = Stock(
+                      //         id: _newStock.id,
+                      //         code: _newStock.code,
+                      //         name: _newStock.name,
+                      //         datePurchased: DateTime.parse(value!),
+                      //         dateRegistored: _newStock.dateRegistored,
+                      //         costPrice: _newStock.costPrice,
+                      //         sellingPrice: _newStock.sellingPrice,
+                      //         packageType: _newStock.packageType,
+                      //         transactions: _newStock.transactions,
+                      //       );
+                      //     }),
 
                       TextFormField(
                           initialValue: _initValues['costPrice'],
@@ -247,7 +242,6 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
                               id: _newStock.id,
                               code: _newStock.code,
                               name: _newStock.name,
-                              datePurchased: _newStock.datePurchased,
                               dateRegistored: _newStock.dateRegistored,
                               costPrice: double.parse(value!),
                               sellingPrice: _newStock.sellingPrice,
@@ -283,7 +277,6 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
                               id: _newStock.id,
                               code: _newStock.code,
                               name: _newStock.name,
-                              datePurchased: _newStock.datePurchased,
                               dateRegistored: _newStock.dateRegistored,
                               costPrice: _newStock.costPrice,
                               sellingPrice: double.parse(value!),
@@ -314,7 +307,6 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
                               id: _newStock.id,
                               code: _newStock.code,
                               name: _newStock.name,
-                              datePurchased: _newStock.datePurchased,
                               dateRegistored: _newStock.dateRegistored,
                               costPrice: _newStock.costPrice,
                               sellingPrice: _newStock.sellingPrice,
@@ -324,35 +316,35 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
                           }),
 
                       //Quatity input field
-                      TextFormField(
-                          initialValue: _initValues['Quantity'],
-                          decoration:
-                              const InputDecoration(labelText: 'Quantity'),
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.number,
-                          focusNode: _quatntityFocusNode,
-                          validator: (value) {
-                            // if (value!.isEmpty) {
-                            //   return 'Please enter a quantity.';
-                            // }
-                            if (int.tryParse(value!) == null) {
-                              return 'Please enter a valid number.';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            _newStock = Stock(
-                              id: _newStock.id,
-                              code: _newStock.code,
-                              name: _newStock.name,
-                              datePurchased: _newStock.datePurchased,
-                              dateRegistored: _newStock.dateRegistored,
-                              costPrice: _newStock.costPrice,
-                              sellingPrice: _newStock.sellingPrice,
-                              packageType: _newStock.packageType,
-                              transactions: _newStock.transactions,
-                            );
-                          }),
+                      // TextFormField(
+                      //     initialValue: _initValues['Quantity'],
+                      //     decoration:
+                      //         const InputDecoration(labelText: 'Quantity'),
+                      //     textInputAction: TextInputAction.next,
+                      //     keyboardType: TextInputType.number,
+                      //     focusNode: _quatntityFocusNode,
+                      //     validator: (value) {
+                      //       // if (value!.isEmpty) {
+                      //       //   return 'Please enter a quantity.';
+                      //       // }
+                      //       if (int.tryParse(value!) == null) {
+                      //         return 'Please enter a valid number.';
+                      //       }
+                      //       return null;
+                      //     },
+                      //     onSaved: (value) {
+                      //       _newStock = Stock(
+                      //         id: _newStock.id,
+                      //         code: _newStock.code,
+                      //         name: _newStock.name,
+                      //         datePurchased: _newStock.datePurchased,
+                      //         dateRegistored: _newStock.dateRegistored,
+                      //         costPrice: _newStock.costPrice,
+                      //         sellingPrice: _newStock.sellingPrice,
+                      //         packageType: _newStock.packageType,
+                      //         transactions: _newStock.transactions,
+                      //       );
+                      //     }),
                       Padding(
                         padding: const EdgeInsets.all(20.0),
                         child: Row(

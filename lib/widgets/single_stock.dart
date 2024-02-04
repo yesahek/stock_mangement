@@ -1,43 +1,23 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:stock_mangement/models/stock.dart';
+import 'package:stock_mangement/screens/add_new_stock_transaction_screen.dart';
 
 import 'package:stock_mangement/screens/stock_transaction_screen.dart';
 import 'package:stock_mangement/util/colors.dart';
 import 'package:stock_mangement/widgets/app_button.dart';
 
 import '../models/transaction.dart';
+import '../screens/sale_screen.dart';
 
 // ignore: must_be_immutable
 class SingleStock extends StatefulWidget {
-  final String stockId;
-  final String name;
-  final int code;
-  final DateTime dateReg;
-  final DateTime datePur;
-  final double costP;
-  final double sellingP;
-  final int balance;
-  final double birrBal;
-  final DateTime lastSailed;
-  final int sailed;
-  final int received;
-  final List<Transaction> transaction;
+  final Stock stock;
+
   bool showDetail;
   SingleStock({
     Key? key,
-    required this.stockId,
-    required this.name,
-    required this.code,
-    required this.dateReg,
-    required this.datePur,
-    required this.costP,
-    required this.sellingP,
-    required this.balance,
-    required this.birrBal,
-    required this.lastSailed,
-    required this.sailed,
-    required this.received,
-    required this.transaction,
+    required this.stock,
     required this.showDetail,
   }) : super(key: key);
 
@@ -71,7 +51,36 @@ class _SingleStockState extends State<SingleStock> {
       context,
       MaterialPageRoute(
         builder: (context) => StockTransaction(
-          stockId: widget.stockId,
+          stockId: widget.stock.id,
+        ),
+      ),
+    );
+  }
+
+  void saleBtn() {
+    //Navigator.of(context).pushNamed('/StockTransaction');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SaleScreen(
+          stockId: widget.stock.id,
+          stockBalance: widget.stock.balance,
+        ),
+      ),
+    );
+  }
+
+  void addNewStockTransactionBtn() {
+    //Navigator.of(context).pushNamed('/StockTransaction');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddNewStockTransactionScreen(
+          transaction: widget.stock.transactions,
+          balance: widget.stock.balance,
+          code: widget.stock.code,
+          name: widget.stock.name,
+          stockId: widget.stock.id,
         ),
       ),
     );
@@ -111,7 +120,7 @@ class _SingleStockState extends State<SingleStock> {
               subtitle: Row(
                 children: [
                   Text(
-                    "code ${widget.code}",
+                    "code ${widget.stock.code}",
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -121,17 +130,21 @@ class _SingleStockState extends State<SingleStock> {
                   const VerticalDivider(
                     width: 40,
                   ),
-                  Text(
-                    "last sailed ${daysBetween(widget.lastSailed)}",
-                    style: const TextStyle(
-                      color: appColor,
-                      fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Text(
+                      "last sailed ${daysBetween(
+                        DateTime.now(),
+                      )}",
+                      style: const TextStyle(
+                        color: appColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
               trailing: Text(
-                "${widget.balance} X",
+                "${widget.stock.balance} X",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -142,7 +155,8 @@ class _SingleStockState extends State<SingleStock> {
           ),
           widget.showDetail
               ? SizedBox(
-                  height: size.height * 0.25,
+                  height: size.height * 0.35,
+                  width: size.width,
                   child: Card(
                     shape: const RoundedRectangleBorder(
                       side: BorderSide(color: appColor, width: 1.0),
@@ -158,32 +172,62 @@ class _SingleStockState extends State<SingleStock> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                Text("Name : ${widget.name}"),
+                                Text("Name : ${widget.stock.name}"),
                                 Text(
-                                    "Date reg : ${widget.dateReg.day}/${widget.dateReg.month}/${widget.dateReg.year}"),
+                                    "Date reg : ${widget.stock.dateRegistored.day}/${widget.stock.dateRegistored.month}/${widget.stock.dateRegistored.year}"),
                                 Text(
-                                    "Date pur : ${widget.datePur.day}/${widget.datePur.month}/${widget.datePur.year}"),
-                                Text("Cost price : ${widget.costP}"),
-                                Text("Selling price : ${widget.sellingP}"),
+                                    "Date pur : ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}"),
+                                Text("Cost price : ${widget.stock.costPrice}"),
+                                Text(
+                                    "Selling price : ${widget.stock.sellingPrice}"),
+                                Text(
+                                    "Total Purchase : ${widget.stock.totalCostPrice}"),
+                                Text(
+                                    "Total sailed : ${widget.stock.totalSailedPrice}"),
                               ],
                             ),
                             Column(
                               // mainAxisAlignment: MainAxisAlignment.end,
                               mainAxisSize: MainAxisSize.max,
                               children: [
-                                Text("${widget.balance} : Balance"),
-                                Text("${widget.birrBal} : Per Birr Bal"),
+                                Text("${widget.stock.balance} : Balance"),
                                 Text(
-                                    "${widget.lastSailed.day}/${widget.lastSailed.month}/${widget.lastSailed.year} : Last Sailed"),
-                                Text("${widget.sailed} : Sailed"),
-                                Text("${widget.received} : Received"),
+                                    "${widget.stock.balance * widget.stock.costPrice} : Per Birr Bal"),
+                                Text(
+                                    "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} : Last Sailed"),
+                                Text("${widget.stock.totalSailed} : Sailed"),
+                                Text(
+                                    "${widget.stock.totalReceived} : Received"),
+                                Text(
+                                    "${(widget.stock.profit / widget.stock.totalSailed) / 100}% : Profit"),
                               ],
                             ),
                           ],
                         ),
-                        AppButton(
-                          title: "Open Stock",
-                          onTap: () => openStockBtn(widget.transaction),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AppButton(
+                              title: "Open Stock",
+                              onTap: () => openStockBtn(
+                                widget.stock.transactions,
+                              ),
+                            ),
+                            SizedBox(
+                              width: size.width * 0.02,
+                            ),
+                            AppButton(
+                              title: "Add new ${widget.stock.name}",
+                              onTap: () => addNewStockTransactionBtn(),
+                            ),
+                            SizedBox(
+                              width: size.width * 0.02,
+                            ),
+                            AppButton(
+                              title: "Sell ",
+                              onTap: () => saleBtn(),
+                            ),
+                          ],
                         ),
                       ],
                     ),

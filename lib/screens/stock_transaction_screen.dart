@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stock_mangement/models/transaction.dart';
 import 'package:stock_mangement/providers/stocks_provider.dart';
 import 'package:stock_mangement/widgets/app_drawer.dart';
 
@@ -9,7 +10,7 @@ import '../util/colors.dart';
 import '../widgets/my_app_bar.dart';
 import '../widgets/single_transaction.dart';
 
-class StockTransaction extends StatefulWidget {
+class StockTransaction extends StatelessWidget {
   final String stockId;
   const StockTransaction({
     Key? key,
@@ -18,13 +19,34 @@ class StockTransaction extends StatefulWidget {
   //static const routeName = "/StockTransaction";
 
   @override
-  State<StockTransaction> createState() => _StockTransactionState();
-}
-
-class _StockTransactionState extends State<StockTransaction> {
-  @override
   Widget build(BuildContext context) {
-    Stock stock = context.watch<StocksProvider>().singleStock(widget.stockId);
+    Stock stock = Provider.of<StocksProvider>(context).singleStock(stockId);
+    List<Transaction> transactions = stock.transactions;
+
+    List<int> balanceGenerator() {
+      List<int> balance = List.filled(transactions.length, 0);
+      int mainBalance = 0;
+
+      if (transactions.isEmpty) {
+        return balance; // Assuming initial balance is 0 if there are no transactions
+      }
+
+      for (int i = 0; i <= transactions.length - 1; i++) {
+        int currentQty = transactions[i].quantity;
+        TransactionType currentType = transactions[i].type;
+
+        if (currentType == TransactionType.buy) {
+          mainBalance += currentQty;
+          balance[i] = mainBalance; // Buying increases the balance
+        } else if (currentType == TransactionType.sell) {
+          mainBalance -= currentQty;
+          balance[i] = mainBalance; // Selling decreases the balance
+        }
+      }
+      return balance;
+    }
+
+    List<int> balances = balanceGenerator();
 
     Widget topBar = Row(
       children: [
@@ -74,21 +96,13 @@ class _StockTransactionState extends State<StockTransaction> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          "Sold",
+                          "Buy / Sell",
                           style: TextStyle(
                             color: Colors.white,
                           ),
                         ),
                       ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          "Received",
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                    
                       Expanded(
                         flex: 1,
                         child: Text(
@@ -105,13 +119,14 @@ class _StockTransactionState extends State<StockTransaction> {
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    itemCount: stock.transactions.length,
+                    itemCount: transactions.length,
                     itemBuilder: (_, i) => SingleTransaction(
-                      stockId: widget.stockId,
+                      stockId: stockId,
                       code: stock.code,
                       name: stock.name,
-                      transaction: stock.transactions[i],
-                      balance: stock.balance,
+                      transaction: transactions[i],
+                      //balance: stock.balance,
+                      balance: balances[i],
                       costPrice: stock.costPrice,
                     ),
                   ),
