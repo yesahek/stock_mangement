@@ -9,6 +9,7 @@ import '../util/colors.dart';
 class CustomDropdownButton extends StatefulWidget {
   final Item bTax;
   final Item sells;
+  // ignore: non_constant_identifier_names
   final List<Stock> Foundstocks;
   final Stock value;
   final Stock Function(Stock) displayFunction;
@@ -18,6 +19,7 @@ class CustomDropdownButton extends StatefulWidget {
     Key? key,
     required this.bTax,
     required this.sells,
+    // ignore: non_constant_identifier_names
     required this.Foundstocks,
     required this.value,
     required this.displayFunction,
@@ -25,15 +27,19 @@ class CustomDropdownButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _CustomDropdownButtonState createState() => _CustomDropdownButtonState();
 }
 
 class _CustomDropdownButtonState extends State<CustomDropdownButton> {
   bool _isDropdownOpen = false;
-
   @override
   Widget build(BuildContext context) {
-  
+    double curretnProfit = widget.bTax.price - widget.value.costPrice;
+    double currentProfitPercent = curretnProfit / widget.value.costPrice * 100;
+
+    double tempProfit = widget.value
+        .calculateTempoProfitPercentage(curretnProfit, widget.sells.quantity);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -41,10 +47,10 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
         InkWell(
           onTap: _toggleDropdown,
           child: ListTile(
-            leading: const Icon(
-              Icons.spa,
-              size: 40,
-            ),
+            // leading: const Icon(
+            //   Icons.spa,
+            //   size: 40,
+            // ),
             title: Text(
               widget.value.name,
               style: const TextStyle(
@@ -54,9 +60,10 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
               ),
             ),
             subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  widget.value.id,
+                  "Code: ${widget.value.code}",
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -68,6 +75,7 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
                 ),
                 Expanded(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         " ${widget.value.balance} Bal | cos ${widget.value.costPrice} ",
@@ -89,24 +97,13 @@ class _CustomDropdownButtonState extends State<CustomDropdownButton> {
                 ),
               ],
             ),
-            trailing: const Column(children: [
-              Text("ST Margin : 10%"),
-              Text("profit  : 08%"),
+            trailing:
+                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text("ST Profit : ${widget.value.profitPercent} %"),
+              Text("profit  : ${currentProfitPercent.toStringAsFixed(2)} %"),
+              Text("AfterThis  : ${tempProfit.toStringAsFixed(2)} %"),
             ]),
           ),
-
-          // InputDecorator(
-          //   decoration: const InputDecoration(
-          //     border: OutlineInputBorder(),
-          //   ),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       Text(widget.displayFunction(widget.value!)),
-          //       Icon(_isDropdownOpen ? Icons.arrow_drop_up : Icons.arrow_drop_down),
-          //     ],
-          //   ),
-          // ),
         ),
         if (_isDropdownOpen)
           Container(

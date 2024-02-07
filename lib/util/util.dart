@@ -1,8 +1,6 @@
 // displaying snackbas
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_mangement/screens/invoice_generator_screen.dart';
-import 'package:stock_mangement/widgets/app_button.dart';
 
 import '../models/item.dart';
 import '../models/items.dart';
@@ -47,7 +45,7 @@ Future<dynamic> showInvoice(
                         width: 10,
                         color: appColor,
                       ),
-                      Text("Tax : ${tax}%"),
+                      Text("Tax : $tax%"),
                       const VerticalDivider(
                         width: 10,
                         color: appColor,

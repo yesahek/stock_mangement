@@ -16,7 +16,7 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       child: OutlinedButton(
-        style: ButtonStyle(backgroundColor: MaterialStatePropertyAll(appColor)),
+        style: const ButtonStyle(backgroundColor: MaterialStatePropertyAll(appColor)),
         onPressed: onTap,
         child: Text(
           title,

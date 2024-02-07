@@ -9,9 +9,9 @@ import 'package:stock_mangement/util/colors.dart';
 import 'package:stock_mangement/util/util.dart';
 import 'package:stock_mangement/widgets/app_drawer.dart';
 
-import '../models/stock.dart';
 import '../widgets/app_button.dart';
 
+// ignore: must_be_immutable
 class AddNewStockTransactionScreen extends StatefulWidget {
   String stockId;
   int code;

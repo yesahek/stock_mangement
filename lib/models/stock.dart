@@ -1,16 +1,33 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:flutter/material.dart';
-
+import 'package:hive/hive.dart';
 import 'transaction.dart';
 
-class Stock with ChangeNotifier {
+part 'stock.g.dart';
+
+@HiveType(typeId: 0)
+class Stock extends HiveObject {
+  @HiveField(0)
   final String id;
+
+  @HiveField(1)
   final int code;
+
+  @HiveField(2)
   final String name;
+
+  @HiveField(3)
   final DateTime dateRegistored;
+
+  @HiveField(4)
   final double costPrice;
+
+  @HiveField(5)
   late final double sellingPrice;
+
+  @HiveField(6)
   final String packageType;
+
+  @HiveField(7)
   final List<Transaction> transactions;
 
   Stock({
@@ -39,6 +56,16 @@ class Stock with ChangeNotifier {
   //profit
   double get profit => calculateProfit(transactions, costPrice);
 
+  //profit percent
+  double get profitPercent =>
+      calculateProfitPercentage(profit, totalPurchase, balance);
+
+  //profit percent if it is sailed
+  // double get TempoProfitPercent => calculateProfitPercentage(profit, totalPurchase, balance);
+
+  //purchase
+  double get totalPurchase => calculatePurchase(transactions);
+
   //total sailed price
   double get totalSailedPrice => calculateTotalSailedPrice(transactions);
 
@@ -54,16 +81,15 @@ class Stock with ChangeNotifier {
 
   // Callback when a transaction changes
   void _onTransactionChanged() {
-    notifyListeners();
+    //   notifyListeners();
   }
 
   // Cleanup: remove listeners when the Stock object is disposed
-  @override
   void dispose() {
     for (var transaction in transactions) {
       transaction.removeListener(_onTransactionChanged);
     }
-    super.dispose();
+    //super.dispose();
   }
 
   static int calculateTotalReceived(List<Transaction> transactions) {
@@ -122,6 +148,36 @@ class Stock with ChangeNotifier {
     // Balance * cost price and substaract from totoal profit
     totalProfit = totalSailedPrice - totalCostPrice;
     return totalProfit;
+  }
+
+  double calculateProfitPercentage(
+      double profit, double totalPurchase, int balance) {
+    double profitPercent = 0.0;
+    double currentPurchase = totalPurchase - (balance * costPrice);
+    profitPercent = (profit / currentPurchase) * 100;
+    return profitPercent;
+  }
+
+  double calculateTempoProfitPercentage(
+    double currentProfit,int qty
+  ) {
+    double profitPercent = 0.0;
+    double tempoProfit = profit;
+    tempoProfit += currentProfit;
+    double currentPurchase = totalPurchase - ((balance - qty) * costPrice);
+    profitPercent = (tempoProfit / currentPurchase) * 100;
+    return profitPercent;
+  }
+
+  //TotalPurchase
+  double calculatePurchase(List<Transaction> transactions) {
+    double purchase = 0.0;
+    for (var transaction in transactions) {
+      if (transaction.type == TransactionType.buy) {
+        purchase += transaction.total;
+      }
+    }
+    return purchase;
   }
 
   //Balance

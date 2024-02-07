@@ -31,21 +31,18 @@ class FactorScreen extends StatefulWidget {
 class _FactorScreenState extends State<FactorScreen> {
   late TextEditingController _invoiceNumberController;
   late TextEditingController _customerNameController;
-  bool _isLoading = false;
   void clear() {}
   void share() {}
   void save(String name) {
     widget.itemList.customerName = name;
     String forSnack = "";
     setState(() {
-      _isLoading = true;
     });
     Provider.of<FactorProvider>(context, listen: false)
         .addFactors(widget.itemList);
     forSnack = "Factor Added successfuly";
 
     setState(() {
-      _isLoading = false;
     });
     showSnackBar(context, forSnack);
     Navigator.of(context).pop();
@@ -90,8 +87,8 @@ class _FactorScreenState extends State<FactorScreen> {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
-    final _formKey = GlobalKey<FormState>();
+   // var height = MediaQuery.of(context).size.height;
+    final formKey = GlobalKey<FormState>();
     List<Item> rows = widget.itemList.Item;
 
     Widget secondBar = Column(
@@ -142,7 +139,7 @@ class _FactorScreenState extends State<FactorScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             children: [
               AppBar(

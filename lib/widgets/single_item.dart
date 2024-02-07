@@ -42,7 +42,6 @@ class _SingleItemState extends State<SingleItem> {
   @override
   Widget build(BuildContext context) {
   
-    var size = MediaQuery.of(context).size;
 
     return Card(
       shape: const RoundedRectangleBorder(

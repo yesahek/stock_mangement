@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:stock_mangement/models/stock.dart';
 import 'package:stock_mangement/models/transaction.dart';
 import 'package:stock_mangement/providers/stocks_provider.dart';
 import 'package:stock_mangement/util/util.dart';
@@ -11,6 +10,7 @@ import 'package:stock_mangement/widgets/app_button.dart';
 import '../util/colors.dart';
 import '../widgets/app_drawer.dart';
 
+// ignore: must_be_immutable
 class SaleScreen extends StatefulWidget {
   String stockId;
   int stockBalance;
@@ -28,7 +28,6 @@ class _SaleScreenState extends State<SaleScreen> {
   @override
   void initState() {
     super.initState();
-    _invoiceNumberController = TextEditingController();
   }
 
   var _newTransaction = Transaction(
@@ -49,11 +48,9 @@ class _SaleScreenState extends State<SaleScreen> {
 
   final _quantityFocusNode = FocusNode();
   final _priceFocusNode = FocusNode();
-  late TextEditingController _invoiceNumberController;
 
   final _form = GlobalKey<FormState>();
   final _formInvoice = GlobalKey<FormState>();
-  bool _isLoading = false;
 
   void acceptInvoiceNumber() {
     showDialog(
@@ -73,6 +70,7 @@ class _SaleScreenState extends State<SaleScreen> {
                 if (value!.isEmpty) {
                   return 'Please enter an Invoice Number';
                 }
+                // ignore: unnecessary_null_comparison
                 if (int.parse(value.toString()) == null) {
                   return 'Please enter a valid number';
                 }
@@ -103,7 +101,6 @@ class _SaleScreenState extends State<SaleScreen> {
   void _save() {
     String forSnack = "";
     setState(() {
-      _isLoading = true;
     });
     _form.currentState?.save();
 
@@ -113,7 +110,6 @@ class _SaleScreenState extends State<SaleScreen> {
     forSnack = "Added successfuly";
 
     setState(() {
-      _isLoading = false;
     });
     Navigator.of(context).popAndPushNamed("/Stocks");
     showSnackBar(context, forSnack);

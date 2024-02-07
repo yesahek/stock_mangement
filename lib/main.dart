@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:stock_mangement/models/stock_adapter.dart';
 import 'package:stock_mangement/providers/factor_provider.dart';
 import 'package:stock_mangement/providers/stocks_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_mangement/screens/factors_screen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/stocks_screen.dart';
 import 'screens/add_new_stocks_screen.dart';
 
-void main() {
+void main() async {
+  // init the hive
+  await Hive.initFlutter();
+// Register the StockAdapter
+  Hive.registerAdapter(StockAdapter());
+  // open a box
+  await Hive.openBox('myBox');
   runApp(const MyApp());
 }
 

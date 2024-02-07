@@ -88,6 +88,7 @@ class _SingleStockState extends State<SingleStock> {
 
   @override
   Widget build(BuildContext context) {
+    String profitPercent = widget.stock.profitPercent.toStringAsFixed(2);
     var size = MediaQuery.of(context).size;
     return Card(
       shape: const RoundedRectangleBorder(
@@ -155,7 +156,7 @@ class _SingleStockState extends State<SingleStock> {
           ),
           widget.showDetail
               ? SizedBox(
-                  height: size.height * 0.35,
+                  height: size.height * 0.30,
                   width: size.width,
                   child: Card(
                     shape: const RoundedRectangleBorder(
@@ -198,8 +199,7 @@ class _SingleStockState extends State<SingleStock> {
                                 Text("${widget.stock.totalSailed} : Sailed"),
                                 Text(
                                     "${widget.stock.totalReceived} : Received"),
-                                Text(
-                                    "${(widget.stock.profit / widget.stock.totalSailed) / 100}% : Profit"),
+                                Text("${profitPercent}% : Profit"),
                               ],
                             ),
                           ],

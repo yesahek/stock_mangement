@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:math_expressions/math_expressions.dart';
-import 'package:provider/provider.dart';
 import 'package:stock_mangement/models/items.dart';
 import 'package:stock_mangement/models/item.dart';
-import 'package:stock_mangement/screens/empity_screen.dart';
 import 'package:stock_mangement/screens/factor_screen.dart';
 import 'package:stock_mangement/screens/invoice_generator_screen.dart';
 
-import '../models/stock.dart';
-import '../providers/stocks_provider.dart';
-import '../util/util.dart';
 
 enum TaxType { percent2, percent15 }
 
@@ -84,7 +78,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       bool isMember = true}) {
     var hei = MediaQuery.of(context).size.height;
     double tax = 2;
-    Items items = parseEquation(equation);
+
     return Container(
       margin: const EdgeInsets.all(02),
       height: (hei * 0.10) * buttonHeight,
@@ -100,11 +94,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           if (isMember) {
             myCal(buttonText);
           } else if (buttonText == 'G') {
+            Items items = parseEquation(equation);
             items.Item[0].price == 0
                 ? generateFactorButton(items, tax, true)
                 : generateFactorButton(items, tax, false);
           } else if (buttonText == 'I') {
             //showInvoice(contextaa, items.Item);
+            Items items = parseEquation(equation);
             Items bTax = beforeTax(items, tax);
             items.Item[0].price == 0
                 ? openInvoiceGenerator(items, bTax, tax, true)

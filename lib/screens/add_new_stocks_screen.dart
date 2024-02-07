@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_mangement/providers/stocks_provider.dart';
 import 'package:stock_mangement/util/colors.dart';
@@ -46,7 +45,6 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
   final _pkgTFocusNode = FocusNode();
   final _quatntityFocusNode = FocusNode();
   final _dateController = TextEditingController();
-  DateTime? _selectedDate;
   final _form = GlobalKey<FormState>();
 
   bool _isLoading = false;
@@ -373,21 +371,4 @@ class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
   }
 
 //Date Selector
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime currentDate = DateTime.now();
-
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? currentDate,
-      firstDate: currentDate.subtract(const Duration(days: 365)),
-      lastDate: currentDate.add(const Duration(days: 365)),
-    );
-
-    if (pickedDate != null && pickedDate != _selectedDate) {
-      setState(() {
-        _selectedDate = pickedDate;
-        _dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
-      });
-    }
-  }
 }

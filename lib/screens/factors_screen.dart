@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_mangement/main.dart';
 import 'package:stock_mangement/providers/factor_provider.dart';
 import 'package:stock_mangement/widgets/app_drawer.dart';
 import 'package:stock_mangement/widgets/my_app_bar.dart';
-import 'package:stock_mangement/widgets/single_stock.dart';
 
 import '../models/items.dart';
 import '../widgets/singelFactor.dart';

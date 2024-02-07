@@ -1,7 +1,11 @@
+// ignore: file_names
+// ignore: file_names
+
 import 'package:flutter/material.dart';
 
 import '../models/items.dart';
 
+// ignore: camel_case_types
 class singleFactor extends StatelessWidget {
   final Items factors;
   const singleFactor({

@@ -20,6 +20,7 @@ class Items with ChangeNotifier {
     // ignore: non_constant_identifier_names
     required this.id,
     required this.customerName,
+    // ignore: non_constant_identifier_names
     required this.Item,
     required this.dateTime,
     required this.total,
