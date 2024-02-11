@@ -1,15 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import '../data/database.dart';
-import '../models/item.dart';
-import '../models/transaction.dart';
-import '../models/stock.dart';
-
-class StocksProvider with ChangeNotifier {
-  //reference the hive box
-  final Box _myBox = Hive.box('myBox');
-  StockDataBase db = StockDataBase();
-
   // final List<Stock> _items = [
   //   Stock(
   //     id: 's1',
@@ -80,6 +68,19 @@ class StocksProvider with ChangeNotifier {
   //   ),
   // ];
 
+
+import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import '../data/database.dart';
+import '../models/item.dart';
+import '../models/transaction.dart';
+import '../models/stock.dart';
+
+class StocksProvider with ChangeNotifier {
+  //reference the hive box
+  final Box _myBox = Hive.box('stocks');
+  StockDataBase db = StockDataBase();
+
   List<Stock> get items {
     //return [..._items];
     return List<Stock>.from(_myBox.values);
@@ -96,9 +97,27 @@ class StocksProvider with ChangeNotifier {
 //Add new Transaction
 
   void addTransaction(Transaction newTransaction, String stockId) {
+    var box = Hive.box('stocks');
+    // Retrieve the existing stock from the box
     Stock findStock = _myBox.values.firstWhere((st) => st.id == stockId);
-    //Stock findStock = _items.firstWhere((st) => st.id == stockId);
-    findStock.transactions.add(newTransaction);
+    // Create a new instance with the updated transactions
+    Stock updatedStock = Stock(
+      id: findStock.id,
+      code: findStock.code,
+      costPrice: findStock.costPrice,
+      dateRegistored: findStock.dateRegistored,
+      name: findStock.name,
+      packageType: findStock.packageType,
+      sellingPrice: findStock.sellingPrice,
+      transactions: [...findStock.transactions, newTransaction],
+    );
+    // Put the updated stock back into the box
+    box.put(findStock.key, updatedStock);
+    // Stock findStock = _myBox.values.firstWhere((st) => st.id == stockId);
+    // //Stock findStock = _items.firstWhere((st) => st.id == stockId);
+    // findStock.transactions.add(newTransaction);
+    // box.put(stockId, findStock);
+
     notifyListeners();
   }
 
@@ -140,17 +159,42 @@ class StocksProvider with ChangeNotifier {
   //finding the closest stock
   List<List<Stock>> getStocksByCostPrice(List<Item> sells) {
     List<List<Stock>> foundStock = [];
-
     for (Item item in sells) {
       List<Stock> filteredStocks = [];
-
       for (Stock stock in _myBox.values) {
         if (stock.costPrice <= item.price) {
           filteredStocks.add(stock);
         }
       }
-
       foundStock.add(filteredStocks);
+    }
+
+    return foundStock;
+  }
+
+  List<List<Stock>> getStocksByCostPriceAndAll(List<Item> sells) {
+    List<List<Stock>> foundStock = [];
+
+    for (Item item in sells) {
+      List<Stock> filteredStocks = [];
+      List<Stock> remainingStocks = [];
+
+      for (Stock stock in _myBox.values) {
+        if (item.price >= stock.costPrice && stock.balance >= item.quantity) {
+          filteredStocks.add(stock);
+        } else {
+          remainingStocks.add(stock);
+        }
+      }
+
+      // Sort filteredStocks in ascending order based on the difference between stock price and item price
+      filteredStocks.sort((a, b) {
+        double diffA = (a.costPrice - item.price).abs();
+        double diffB = (b.costPrice - item.price).abs();
+        return diffA.compareTo(diffB);
+      });
+
+      foundStock.add(filteredStocks + remainingStocks);
     }
 
     return foundStock;
@@ -159,15 +203,11 @@ class StocksProvider with ChangeNotifier {
   //just simpley get all stocks
   List<List<Stock>> getStocksAll() {
     List<List<Stock>> foundStock = [];
-
     List<Stock> filteredStocks = [];
-
     for (Stock stock in _myBox.values) {
       filteredStocks.add(stock);
     }
-
     foundStock.add(filteredStocks);
-
     return foundStock;
   }
 

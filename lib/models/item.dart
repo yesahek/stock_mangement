@@ -15,5 +15,13 @@ class Item with ChangeNotifier {
     required this.total,
   });
 
- 
+  Item clone() {
+    return Item(
+      id: id,
+      name: name,
+      quantity: quantity,
+      price: price,
+      total: total,
+    );
+  }
 }

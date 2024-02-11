@@ -42,4 +42,21 @@ class Items with ChangeNotifier {
 //     }
 //     return result;
 //   }
+
+Items clone() {
+    return Items(
+      id: id,
+      customerName: customerName,
+      Item: Item.map((originalItem) => originalItem.clone()).toList(),
+      dateTime: dateTime,
+      total: total,
+      loan: loan,
+      payment: payment,
+      isPaid: isPaid,
+      serviceCharge: serviceCharge,
+      discount: discount,
+      oldLoan: oldLoan,
+    );
+  }
+
 }

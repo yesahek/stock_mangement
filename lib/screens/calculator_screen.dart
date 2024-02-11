@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:provider/provider.dart';
 import 'package:stock_mangement/models/items.dart';
 import 'package:stock_mangement/models/item.dart';
 import 'package:stock_mangement/screens/factor_screen.dart';
 import 'package:stock_mangement/screens/invoice_generator_screen.dart';
 
+import '../models/item.dart';
+import '../models/item.dart';
+import '../providers/stocks_provider.dart';
+import '../util/util.dart';
+import '../widgets/invoice_generator.dart';
 
 enum TaxType { percent2, percent15 }
 
@@ -105,6 +111,13 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             items.Item[0].price == 0
                 ? openInvoiceGenerator(items, bTax, tax, true)
                 : openInvoiceGenerator(items, bTax, tax, false);
+          } else if (buttonText == '^') {
+            Items items = parseEquation(equation);
+            Items bTax = beforeTax(items, tax);
+
+            items.Item[0].price == 0
+                ? invoiceBottomSheet(items, tax, bTax, true)
+                : invoiceBottomSheet(items, tax, bTax, false);
           }
         },
         child: Text(
@@ -119,21 +132,21 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  Items beforeTax(Items items, double tax) {
-    Items bTax = items;
+  Items beforeTax(Items sells, double tax) {
+    Items bTax = sells.clone();
     double percent = 0.0;
     if (tax == 2) {
       percent = 1.02;
     } else if (tax == 15) {
-      percent == 1.15;
+      percent = 1.15;
     }
     bTax.total = 0.0;
-    for (var i = 0; i < items.Item.length; i++) {
-      double origingalPrice = items.Item[i].price;
+    for (var i = 0; i < bTax.Item.length; i++) {
+      double origingalPrice = bTax.Item[i].price;
       double bTaxPrice = origingalPrice / percent;
       String price = bTaxPrice.toStringAsFixed(2);
       bTax.Item[i].price = double.parse(price);
-      bTax.Item[i].total = items.Item[i].quantity * bTax.Item[i].price;
+      bTax.Item[i].total = bTax.Item[i].quantity * bTax.Item[i].price;
       bTax.total += bTax.Item[i].total;
     }
 
@@ -186,6 +199,24 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     return items;
   }
 
+  invoiceBottomSheet(Items items, double tax, Items bTax, bool isEmpity) {
+    bool stockAvailable = true;
+    int availableStockLength = StocksProvider().items.length;
+    if (availableStockLength == 0) {
+      stockAvailable = false;
+    } else {
+      stockAvailable = true;
+    }
+    isEmpity
+        ? ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('It\'s 000.00.'),
+          ))
+        : stockAvailable
+            ? showInvoice(context, bTax, bTax.Item, tax)
+            : showSnackBar(context, "There is No Available Stock!");
+  }
+
+//G button
   generateFactorButton(Items items, double tax, bool isEmpity) {
     isEmpity
         ? ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -196,7 +227,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               builder: (context) => equation == ""
                   ? const SizedBox()
                   : FactorScreen(
-                      itemList: items,
+                      originalList: items,
                       bTax: beforeTax(items, tax),
                       tax: tax,
                     ),
@@ -204,25 +235,38 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           );
   }
 
+//I button function
   void openInvoiceGenerator(Items items, bTax, tax, bool itsEmpity) {
+    List<Item> it = items.Item;
+    bool stockAvailable = true;
+    int availableStockLength = StocksProvider().items.length;
+
+    if (availableStockLength == 0) {
+      stockAvailable = false;
+    } else {
+      stockAvailable = true;
+    }
     itsEmpity
         ? ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('It\'s 000.00.'),
           ))
-        : showModalBottomSheet(
-            isScrollControlled: true,
-            showDragHandle: true,
-            context: context,
-            builder: (ctx) {
-              {
-                return InvoiceGeneratorScreen(
-                  items: items,
-                  bTax: bTax,
-                  tax: tax,
-                );
-              }
-            },
-          );
+        : stockAvailable
+            ? showModalBottomSheet(
+                isScrollControlled: true,
+                showDragHandle: true,
+                useSafeArea: true,
+                context: context,
+                builder: (ctx) {
+                  {
+                    return InvoiceGeneratorScreen(
+                      items: it,
+                      bTax: bTax,
+                      tax: tax,
+                    );
+                  }
+                },
+              )
+            : showSnackBar(context, "There is No Stock Available!");
   }
 
   @override
@@ -326,9 +370,10 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                                   buttonHeight: 1,
                                   buttonColor: blue),
                               myCustomButton(
-                                  buttonText: "-",
+                                  buttonText: "^",
                                   buttonHeight: 1,
-                                  buttonColor: yellow),
+                                  buttonColor: yellow,
+                                  isMember: false),
                             ]),
                             TableRow(children: [
                               myCustomButton(

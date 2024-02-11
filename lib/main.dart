@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:stock_mangement/screens/factors_screen.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'models/transaction_adapter.dart';
 import 'screens/home_screen.dart';
 import 'screens/stocks_screen.dart';
 import 'screens/add_new_stocks_screen.dart';
@@ -15,8 +16,10 @@ void main() async {
   await Hive.initFlutter();
 // Register the StockAdapter
   Hive.registerAdapter(StockAdapter());
+
+  Hive.registerAdapter(TransactionAdapter()); // Register the adapter
   // open a box
-  await Hive.openBox('myBox');
+  await Hive.openBox('stocks');
   runApp(const MyApp());
 }
 

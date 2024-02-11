@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
+
 import 'package:stock_mangement/providers/stocks_provider.dart';
 import 'package:stock_mangement/util/colors.dart';
 import 'package:stock_mangement/util/util.dart';
@@ -17,8 +19,9 @@ class AddNewStocksScreen extends StatefulWidget {
 }
 
 class _AddNewStocksScreenState extends State<AddNewStocksScreen> {
+  String newId = const Uuid().v1();
   var _newStock = Stock(
-    id: "00",
+    id: const Uuid().v1(),
     code: 00,
     name: "",
     dateRegistored: DateTime.now(),

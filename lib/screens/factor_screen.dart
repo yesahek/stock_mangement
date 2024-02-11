@@ -4,22 +4,24 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:stock_mangement/providers/factor_provider.dart';
+import 'package:stock_mangement/providers/stocks_provider.dart';
 import 'package:stock_mangement/util/colors.dart';
 import 'package:stock_mangement/widgets/app_button.dart';
 
 import '../models/item.dart';
 import '../models/items.dart';
 import '../util/util.dart';
+import '../widgets/invoice_generator.dart';
 import '../widgets/my_text_box.dart';
 
 // ignore: must_be_immutable
 class FactorScreen extends StatefulWidget {
-  Items itemList;
+  Items originalList;
   Items bTax;
   final double tax;
   FactorScreen({
     Key? key,
-    required this.itemList,
+    required this.originalList,
     required this.bTax,
     required this.tax,
   }) : super(key: key);
@@ -34,16 +36,14 @@ class _FactorScreenState extends State<FactorScreen> {
   void clear() {}
   void share() {}
   void save(String name) {
-    widget.itemList.customerName = name;
+    widget.originalList.customerName = name;
     String forSnack = "";
-    setState(() {
-    });
+    setState(() {});
     Provider.of<FactorProvider>(context, listen: false)
-        .addFactors(widget.itemList);
+        .addFactors(widget.originalList);
     forSnack = "Factor Added successfuly";
 
-    setState(() {
-    });
+    setState(() {});
     showSnackBar(context, forSnack);
     Navigator.of(context).pop();
   }
@@ -70,6 +70,13 @@ class _FactorScreenState extends State<FactorScreen> {
     );
   }
 
+  //Generate Invoice Button
+  void generateInvoice(bool isStockAvailable) {
+    isStockAvailable
+        ? showInvoice(context, widget.bTax, widget.bTax.Item, widget.tax)
+        : showSnackBar(context, "There is No Stock Available!");
+  }
+
   @override
   void initState() {
     super.initState();
@@ -87,10 +94,18 @@ class _FactorScreenState extends State<FactorScreen> {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-   // var height = MediaQuery.of(context).size.height;
+    // var height = MediaQuery.of(context).size.height;
     final formKey = GlobalKey<FormState>();
-    List<Item> rows = widget.itemList.Item;
-
+    bool stockAvailable = true;
+    int availableStockLength =
+        Provider.of<StocksProvider>(context).items.length;
+    if (availableStockLength == 0) {
+      stockAvailable = false;
+    } else {
+      stockAvailable = true;
+    }
+    List<Item> originalList = widget.originalList.Item;
+    List<Item> bTaxRows = widget.bTax.Item;
     Widget secondBar = Column(
       children: [
         const Divider(
@@ -160,7 +175,7 @@ class _FactorScreenState extends State<FactorScreen> {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    Navigator.pop(context, widget.itemList);
+                    Navigator.pop(context, widget.originalList);
                   },
                 ),
               ),
@@ -173,7 +188,7 @@ class _FactorScreenState extends State<FactorScreen> {
                 mainAxisAlignment: MainAxisAlignment.values[5],
                 children: [
                   Text(
-                    widget.itemList.customerName,
+                    widget.originalList.customerName,
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
@@ -211,7 +226,7 @@ class _FactorScreenState extends State<FactorScreen> {
                                 DataColumn(label: Text('Total')),
                               ],
                               rows: [
-                                for (var item in rows)
+                                for (var item in originalList)
                                   DataRow(
                                     cells: [
                                       DataCell(Text(item.id)),
@@ -242,34 +257,32 @@ class _FactorScreenState extends State<FactorScreen> {
                             children: [
                               const Divider(),
                               MyTextBox(
-                                amount: widget.itemList.total,
+                                amount: widget.originalList.total,
                                 labelText: "Total      ",
                                 isEditable: false,
                               ),
                               MyTextBox(
-                                amount: widget.itemList.payment,
+                                amount: widget.originalList.payment,
                                 labelText: "payment",
                                 onChanged: (value) {
                                   setState(() {
-                                    widget.itemList.payment =
+                                    widget.originalList.payment =
                                         double.parse(value);
-                                    widget.itemList.loan =
-                                        widget.itemList.total -
+                                    widget.originalList.loan =
+                                        widget.originalList.total -
                                             double.parse(value);
                                   });
                                 },
                               ),
                               Text(
-                                  "Loan                          ${widget.itemList.loan}"),
+                                  "Loan                          ${widget.originalList.loan}"),
                             ],
                           ),
                           const Divider(),
                           OutlinedButton(
-                              onPressed: () {
-                                showInvoice(
-                                    context, widget.bTax, rows, widget.tax);
-                              },
-                              child: const Text("Generate Invoice")),
+                            onPressed: () => generateInvoice(stockAvailable),
+                            child: const Text("Generate Invoice"),
+                          ),
                         ],
                       ),
                     ),

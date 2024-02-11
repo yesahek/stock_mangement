@@ -12,6 +12,8 @@ class SingleItem extends StatefulWidget {
   final Item bTax;
   final Item item;
   final List<Stock> founStock;
+  final Function(Stock stock, Item item) trackItem;
+  final Function(Stock selectedStock) onStockSelected;
 
   bool showDetail;
   SingleItem({
@@ -19,6 +21,8 @@ class SingleItem extends StatefulWidget {
     required this.bTax,
     required this.item,
     required this.founStock,
+    required this.trackItem,
+    required this.onStockSelected,
     required this.showDetail,
   }) : super(key: key);
 
@@ -34,15 +38,16 @@ class _SingleItemState extends State<SingleItem> {
     });
   }
 
+  late Stock selectedStockId; // Variable to store the selected stock
+
   @override
   void initState() {
     super.initState();
+    selectedStockId = widget.founStock[0]; // Set default value
   }
 
   @override
   Widget build(BuildContext context) {
-  
-
     return Card(
       shape: const RoundedRectangleBorder(
         side: BorderSide(color: appColor, width: 4.0),
@@ -74,11 +79,15 @@ class _SingleItemState extends State<SingleItem> {
                         sells: widget.item,
                         Foundstocks: widget.founStock,
                         value: widget.founStock[0],
-                        displayFunction: (Stock value) => value,
+                        displayFunction: (Stock value) =>
+                            widget.trackItem(value, widget.item),
                         onChanged: (Stock? val) {
                           if (val != null) {
                             int selectedIndex = widget.founStock.indexOf(val);
+                            // widget.onStockSelected(
+                            //     widget.founStock[selectedIndex]);
                             setState(() {
+                              widget.onStockSelected(val);
                               // Swap the values at the first position and the selected index
                               Stock temp = widget.founStock[0];
                               widget.founStock[0] =
